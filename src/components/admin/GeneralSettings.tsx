@@ -4,8 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Globe, Type } from "lucide-react";
 
 export function GeneralSettings() {
-  const { config, updateGlobal, updateFooter } = useHubConfig();
-  const { global, footer } = config;
+  const { config, updateGlobal } = useHubConfig();
+  const { global } = config;
 
   return (
     <div className="space-y-6">
@@ -17,7 +17,7 @@ export function GeneralSettings() {
         <div className="space-y-4">
           <div>
             <Label htmlFor="appTitle" className="text-sm text-muted-foreground">
-              Título Principal
+              Título do App
             </Label>
             <Input
               id="appTitle"
@@ -27,13 +27,24 @@ export function GeneralSettings() {
             />
           </div>
           <div>
-            <Label htmlFor="appSubtitle" className="text-sm text-muted-foreground">
-              Subtítulo
+            <Label htmlFor="headerTitle" className="text-sm text-muted-foreground">
+              Título do Header
             </Label>
             <Input
-              id="appSubtitle"
-              value={global.appSubtitle}
-              onChange={(e) => updateGlobal({ appSubtitle: e.target.value })}
+              id="headerTitle"
+              value={global.headerTitle}
+              onChange={(e) => updateGlobal({ headerTitle: e.target.value })}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label htmlFor="headerSubtitle" className="text-sm text-muted-foreground">
+              Subtítulo do Header
+            </Label>
+            <Input
+              id="headerSubtitle"
+              value={global.headerSubtitle}
+              onChange={(e) => updateGlobal({ headerSubtitle: e.target.value })}
               className="mt-1"
             />
           </div>
@@ -58,6 +69,18 @@ export function GeneralSettings() {
               placeholder="https://..."
             />
           </div>
+          <div>
+            <Label htmlFor="logoUrl" className="text-sm text-muted-foreground">
+              URL do Logo
+            </Label>
+            <Input
+              id="logoUrl"
+              value={global.logoUrl}
+              onChange={(e) => updateGlobal({ logoUrl: e.target.value })}
+              className="mt-1"
+              placeholder="/assets/logo.svg"
+            />
+          </div>
         </div>
       </div>
 
@@ -72,8 +95,8 @@ export function GeneralSettings() {
           </Label>
           <Input
             id="footerText"
-            value={footer.text}
-            onChange={(e) => updateFooter({ text: e.target.value })}
+            value={global.footerText}
+            onChange={(e) => updateGlobal({ footerText: e.target.value })}
             className="mt-1"
           />
         </div>
