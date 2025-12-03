@@ -14,15 +14,19 @@ import { ScrollToTop } from "@/components/hub/ScrollToTop";
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isAdmin } = useAuth();
   const [activeSection, setActiveSection] = useState("resumo");
 
-  // Redirect to auth if not logged in
+  // Redirect to auth if not logged in, or home if not admin
   useEffect(() => {
-    if (!isLoading && !user) {
-      navigate("/auth");
+    if (!isLoading) {
+      if (!user) {
+        navigate("/auth");
+      } else if (!isAdmin) {
+        navigate("/");
+      }
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, isAdmin, navigate]);
 
   if (isLoading) {
     return (
@@ -32,7 +36,7 @@ const Admin = () => {
     );
   }
 
-  if (!user) {
+  if (!user || !isAdmin) {
     return null; // Will redirect
   }
 
