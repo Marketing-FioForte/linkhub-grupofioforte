@@ -1,11 +1,16 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { HubConfig, Alert, ImportantDate, SipatDay, SipatActivity } from "@/types/hubConfig";
 import { defaultConfig } from "@/config/hubConfigDefault";
+import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 
-const STORAGE_KEY = "fioforte-hub-config";
+const CONFIG_KEY = "main";
 
 interface HubConfigContextType {
   config: HubConfig;
+  isLoading: boolean;
+  isSaving: boolean;
+  error: string | null;
   setConfig: (newConfig: HubConfig) => void;
   updateGlobal: (global: Partial<HubConfig["global"]>) => void;
   updateQuickActions: (quickActions: HubConfig["quickActions"]) => void;
@@ -36,196 +41,341 @@ function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
-function loadConfigFromStorage(): HubConfig {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored) as HubConfig;
-    }
-  } catch (error) {
-    console.error("Error loading config from localStorage:", error);
-  }
-  return defaultConfig;
-}
-
-function saveConfigToStorage(config: HubConfig) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-  } catch (error) {
-    console.error("Error saving config to localStorage:", error);
-  }
-}
-
 export function HubConfigProvider({ children }: { children: ReactNode }) {
-  const [config, setConfigState] = useState<HubConfig>(loadConfigFromStorage);
+  const [config, setConfigState] = useState<HubConfig>(defaultConfig);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    saveConfigToStorage(config);
-  }, [config]);
+  // Load config from database
+  const loadConfig = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-  // Listen to storage changes from other tabs
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY && e.newValue) {
-        setConfigState(JSON.parse(e.newValue));
+      const { data, error: fetchError } = await supabase
+        .from("hub_config")
+        .select("config_data")
+        .eq("config_key", CONFIG_KEY)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error("Error loading config:", fetchError);
+        setError("Erro ao carregar configurações");
+        return;
       }
+
+      if (data?.config_data) {
+        setConfigState(data.config_data as unknown as HubConfig);
+      } else {
+        // No config in DB yet, insert the default
+        const { error: insertError } = await supabase
+          .from("hub_config")
+          .insert([{
+            config_key: CONFIG_KEY,
+            config_data: JSON.parse(JSON.stringify(defaultConfig)) as Json,
+          }]);
+
+        if (insertError) {
+          console.error("Error inserting default config:", insertError);
+          // Still use default config locally
+        }
+        setConfigState(defaultConfig);
+      }
+    } catch (err) {
+      console.error("Unexpected error loading config:", err);
+      setError("Erro inesperado ao carregar configurações");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Save config to database
+  const saveConfig = useCallback(async (newConfig: HubConfig) => {
+    try {
+      setIsSaving(true);
+      setError(null);
+
+      const { error: upsertError } = await supabase
+        .from("hub_config")
+        .upsert(
+          [{
+            config_key: CONFIG_KEY,
+            config_data: JSON.parse(JSON.stringify(newConfig)) as Json,
+            updated_at: new Date().toISOString(),
+          }],
+          { onConflict: "config_key" }
+        );
+
+      if (upsertError) {
+        console.error("Error saving config:", upsertError);
+        setError("Erro ao salvar configurações");
+      }
+    } catch (err) {
+      console.error("Unexpected error saving config:", err);
+      setError("Erro inesperado ao salvar configurações");
+    } finally {
+      setIsSaving(false);
+    }
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    loadConfig();
+  }, [loadConfig]);
+
+  // Real-time subscription for cross-device sync
+  useEffect(() => {
+    const channel = supabase
+      .channel("hub-config-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "hub_config",
+          filter: `config_key=eq.${CONFIG_KEY}`,
+        },
+        (payload) => {
+          console.log("Real-time config update received:", payload);
+          if (payload.new && "config_data" in payload.new) {
+            setConfigState(payload.new.config_data as unknown as HubConfig);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
     };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   const setConfig = (newConfig: HubConfig) => {
     setConfigState(newConfig);
+    saveConfig(newConfig);
   };
 
   const updateGlobal = (global: Partial<HubConfig["global"]>) => {
-    setConfigState((prev) => ({ ...prev, global: { ...prev.global, ...global } }));
+    setConfigState((prev) => {
+      const updated = { ...prev, global: { ...prev.global, ...global } };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const updateQuickActions = (quickActions: HubConfig["quickActions"]) => {
-    setConfigState((prev) => ({ ...prev, quickActions }));
+    setConfigState((prev) => {
+      const updated = { ...prev, quickActions };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   // Alerts
   const updateAlerts = (alerts: HubConfig["alerts"]) => {
-    setConfigState((prev) => ({ ...prev, alerts }));
+    setConfigState((prev) => {
+      const updated = { ...prev, alerts };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const addAlert = (alert: Omit<Alert, "id">) => {
-    setConfigState((prev) => ({
-      ...prev,
-      alerts: [...prev.alerts, { ...alert, id: generateId() }],
-    }));
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        alerts: [...prev.alerts, { ...alert, id: generateId() }],
+      };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const updateAlert = (id: string, alert: Partial<Alert>) => {
-    setConfigState((prev) => ({
-      ...prev,
-      alerts: prev.alerts.map((a) => (a.id === id ? { ...a, ...alert } : a)),
-    }));
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        alerts: prev.alerts.map((a) => (a.id === id ? { ...a, ...alert } : a)),
+      };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const deleteAlert = (id: string) => {
-    setConfigState((prev) => ({
-      ...prev,
-      alerts: prev.alerts.filter((a) => a.id !== id),
-    }));
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        alerts: prev.alerts.filter((a) => a.id !== id),
+      };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const toggleAlertActive = (id: string) => {
-    setConfigState((prev) => ({
-      ...prev,
-      alerts: prev.alerts.map((a) => (a.id === id ? { ...a, active: !a.active } : a)),
-    }));
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        alerts: prev.alerts.map((a) => (a.id === id ? { ...a, active: !a.active } : a)),
+      };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   // Important Dates
   const updateImportantDates = (importantDates: HubConfig["importantDates"]) => {
     const sorted = [...importantDates].sort((a, b) => a.date.localeCompare(b.date));
-    setConfigState((prev) => ({ ...prev, importantDates: sorted }));
+    setConfigState((prev) => {
+      const updated = { ...prev, importantDates: sorted };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const addImportantDate = (date: Omit<ImportantDate, "id">) => {
     setConfigState((prev) => {
       const newDates = [...prev.importantDates, { ...date, id: generateId() }];
-      return { ...prev, importantDates: newDates.sort((a, b) => a.date.localeCompare(b.date)) };
+      const updated = { ...prev, importantDates: newDates.sort((a, b) => a.date.localeCompare(b.date)) };
+      saveConfig(updated);
+      return updated;
     });
   };
 
   const updateImportantDate = (id: string, date: Partial<ImportantDate>) => {
     setConfigState((prev) => {
-      const updated = prev.importantDates.map((d) => (d.id === id ? { ...d, ...date } : d));
-      return { ...prev, importantDates: updated.sort((a, b) => a.date.localeCompare(b.date)) };
+      const newDates = prev.importantDates.map((d) => (d.id === id ? { ...d, ...date } : d));
+      const updated = { ...prev, importantDates: newDates.sort((a, b) => a.date.localeCompare(b.date)) };
+      saveConfig(updated);
+      return updated;
     });
   };
 
   const deleteImportantDate = (id: string) => {
-    setConfigState((prev) => ({
-      ...prev,
-      importantDates: prev.importantDates.filter((d) => d.id !== id),
-    }));
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        importantDates: prev.importantDates.filter((d) => d.id !== id),
+      };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   // SIPAT
   const updateSipat = (sipat: Partial<HubConfig["sipat"]>) => {
-    setConfigState((prev) => ({ ...prev, sipat: { ...prev.sipat, ...sipat } }));
+    setConfigState((prev) => {
+      const updated = { ...prev, sipat: { ...prev.sipat, ...sipat } };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const addSipatDay = (day: Omit<SipatDay, "id">) => {
-    setConfigState((prev) => ({
-      ...prev,
-      sipat: {
-        ...prev.sipat,
-        days: [...prev.sipat.days, { ...day, id: generateId() }].sort((a, b) => a.date.localeCompare(b.date)),
-      },
-    }));
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        sipat: {
+          ...prev.sipat,
+          days: [...prev.sipat.days, { ...day, id: generateId() }].sort((a, b) => a.date.localeCompare(b.date)),
+        },
+      };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const updateSipatDay = (id: string, day: Partial<SipatDay>) => {
-    setConfigState((prev) => ({
-      ...prev,
-      sipat: {
-        ...prev.sipat,
-        days: prev.sipat.days.map((d) => (d.id === id ? { ...d, ...day } : d)),
-      },
-    }));
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        sipat: {
+          ...prev.sipat,
+          days: prev.sipat.days.map((d) => (d.id === id ? { ...d, ...day } : d)),
+        },
+      };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const deleteSipatDay = (id: string) => {
-    setConfigState((prev) => ({
-      ...prev,
-      sipat: {
-        ...prev.sipat,
-        days: prev.sipat.days.filter((d) => d.id !== id),
-      },
-    }));
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        sipat: {
+          ...prev.sipat,
+          days: prev.sipat.days.filter((d) => d.id !== id),
+        },
+      };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const addSipatActivity = (dayId: string, activity: Omit<SipatActivity, "id">) => {
-    setConfigState((prev) => ({
-      ...prev,
-      sipat: {
-        ...prev.sipat,
-        days: prev.sipat.days.map((d) =>
-          d.id === dayId ? { ...d, activities: [...d.activities, { ...activity, id: generateId() }] } : d
-        ),
-      },
-    }));
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        sipat: {
+          ...prev.sipat,
+          days: prev.sipat.days.map((d) =>
+            d.id === dayId ? { ...d, activities: [...d.activities, { ...activity, id: generateId() }] } : d
+          ),
+        },
+      };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const updateSipatActivity = (dayId: string, activityId: string, activity: Partial<SipatActivity>) => {
-    setConfigState((prev) => ({
-      ...prev,
-      sipat: {
-        ...prev.sipat,
-        days: prev.sipat.days.map((d) =>
-          d.id === dayId
-            ? { ...d, activities: d.activities.map((a) => (a.id === activityId ? { ...a, ...activity } : a)) }
-            : d
-        ),
-      },
-    }));
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        sipat: {
+          ...prev.sipat,
+          days: prev.sipat.days.map((d) =>
+            d.id === dayId
+              ? { ...d, activities: d.activities.map((a) => (a.id === activityId ? { ...a, ...activity } : a)) }
+              : d
+          ),
+        },
+      };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const deleteSipatActivity = (dayId: string, activityId: string) => {
-    setConfigState((prev) => ({
-      ...prev,
-      sipat: {
-        ...prev.sipat,
-        days: prev.sipat.days.map((d) =>
-          d.id === dayId ? { ...d, activities: d.activities.filter((a) => a.id !== activityId) } : d
-        ),
-      },
-    }));
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        sipat: {
+          ...prev.sipat,
+          days: prev.sipat.days.map((d) =>
+            d.id === dayId ? { ...d, activities: d.activities.filter((a) => a.id !== activityId) } : d
+          ),
+        },
+      };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   // Institutional
   const updateInstitutional = (institutional: HubConfig["institutional"]) => {
-    setConfigState((prev) => ({ ...prev, institutional }));
+    setConfigState((prev) => {
+      const updated = { ...prev, institutional };
+      saveConfig(updated);
+      return updated;
+    });
   };
 
   const resetToDefault = () => {
     setConfigState(defaultConfig);
+    saveConfig(defaultConfig);
   };
 
   const exportConfig = () => {
@@ -236,6 +386,9 @@ export function HubConfigProvider({ children }: { children: ReactNode }) {
     <HubConfigContext.Provider
       value={{
         config,
+        isLoading,
+        isSaving,
+        error,
         setConfig,
         updateGlobal,
         updateQuickActions,
