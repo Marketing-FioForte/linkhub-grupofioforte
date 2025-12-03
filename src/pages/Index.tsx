@@ -5,6 +5,7 @@ import { AlertsSection } from "@/components/hub/AlertsSection";
 import { ImportantDates } from "@/components/hub/ImportantDates";
 import { SipatSchedule } from "@/components/hub/SipatSchedule";
 import { InstitutionalSection } from "@/components/hub/InstitutionalSection";
+import { AdminAccessButton } from "@/components/hub/AdminAccessButton";
 import { HubFooter } from "@/components/hub/HubFooter";
 import { ScrollToTop } from "@/components/hub/ScrollToTop";
 
@@ -19,6 +20,7 @@ const Index = () => {
         <ImportantDates />
         <SipatSchedule />
         <InstitutionalSection />
+        <AdminAccessButton />
         <HubFooter />
       </main>
       <ScrollToTop />
