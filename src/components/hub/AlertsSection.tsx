@@ -1,9 +1,10 @@
-import { hubConfig } from "@/config/hubConfig";
+import { useHubConfig } from "@/contexts/HubConfigContext";
 import { useState } from "react";
 import { Info } from "lucide-react";
 
 export function AlertsSection() {
-  const { alerts, alertsLastUpdated } = hubConfig;
+  const { config } = useHubConfig();
+  const { alerts, alertsLastUpdated } = config;
   const [expanded, setExpanded] = useState(false);
 
   const visibleAlerts = expanded ? alerts : alerts.slice(0, 3);

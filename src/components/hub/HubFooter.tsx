@@ -1,7 +1,8 @@
-import { hubConfig } from "@/config/hubConfig";
+import { useHubConfig } from "@/contexts/HubConfigContext";
 
 export function HubFooter() {
-  const { footer } = hubConfig;
+  const { config } = useHubConfig();
+  const { footer } = config;
 
   return (
     <footer className="py-6 text-center">

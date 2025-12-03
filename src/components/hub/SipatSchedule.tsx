@@ -1,8 +1,9 @@
-import { hubConfig } from "@/config/hubConfig";
+import { useHubConfig } from "@/contexts/HubConfigContext";
 import { Clock, CalendarDays } from "lucide-react";
 
 export function SipatSchedule() {
-  const { sipat } = hubConfig;
+  const { config } = useHubConfig();
+  const { sipat } = config;
 
   if (!sipat.show) return null;
 

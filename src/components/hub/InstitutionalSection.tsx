@@ -1,4 +1,4 @@
-import { hubConfig } from "@/config/hubConfig";
+import { useHubConfig } from "@/contexts/HubConfigContext";
 import { Shield, FileText } from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -7,7 +7,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export function InstitutionalSection() {
-  const { institutional } = hubConfig;
+  const { config } = useHubConfig();
+  const { institutional } = config;
 
   return (
     <section className="mb-6 animate-fade-in">

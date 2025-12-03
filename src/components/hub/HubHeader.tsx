@@ -1,8 +1,9 @@
-import { hubConfig } from "@/config/hubConfig";
+import { useHubConfig } from "@/contexts/HubConfigContext";
 import logoFioforte from "@/assets/logo-grupo-fioforte.png";
 
 export function HubHeader() {
-  const { appTitle, appSubtitle } = hubConfig.global;
+  const { config } = useHubConfig();
+  const { appTitle, appSubtitle } = config.global;
 
   return (
     <header className="flex flex-col items-center pt-8 pb-6">
