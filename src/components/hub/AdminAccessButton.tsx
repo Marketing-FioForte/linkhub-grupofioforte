@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
 import { Lock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function AdminAccessButton() {
+  const { user } = useAuth();
+  
   return (
     <div className="flex justify-center mb-6">
       <Link
-        to="/admin"
+        to={user ? "/admin" : "/auth"}
         className="inline-flex items-center justify-center gap-2 
                    px-6 py-3 min-h-[44px]
                    border border-primary rounded-lg

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { AdminLogin } from "@/components/admin/AdminLogin";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminSummary } from "@/components/admin/AdminSummary";
 import { QuickActionsEditor } from "@/components/admin/QuickActionsEditor";
@@ -8,18 +9,20 @@ import { DatesEditor } from "@/components/admin/DatesEditor";
 import { SipatEditor } from "@/components/admin/SipatEditor";
 import { InstitutionalEditor } from "@/components/admin/InstitutionalEditor";
 import { AdminConfigSettings } from "@/components/admin/AdminConfigSettings";
+import { HistoryEditor } from "@/components/admin/HistoryEditor";
 import { ScrollToTop } from "@/components/hub/ScrollToTop";
 
 const Admin = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
   const [activeSection, setActiveSection] = useState("resumo");
 
+  // Redirect to auth if not logged in
   useEffect(() => {
-    const authStatus = sessionStorage.getItem("adminAuth");
-    setIsAuthenticated(authStatus === "true");
-    setIsLoading(false);
-  }, []);
+    if (!isLoading && !user) {
+      navigate("/auth");
+    }
+  }, [user, isLoading, navigate]);
 
   if (isLoading) {
     return (
@@ -29,8 +32,8 @@ const Admin = () => {
     );
   }
 
-  if (!isAuthenticated) {
-    return <AdminLogin onLogin={() => setIsAuthenticated(true)} />;
+  if (!user) {
+    return null; // Will redirect
   }
 
   const renderContent = () => {
@@ -47,6 +50,8 @@ const Admin = () => {
         return <SipatEditor />;
       case "institucional":
         return <InstitutionalEditor />;
+      case "historico":
+        return <HistoryEditor />;
       case "config":
         return <AdminConfigSettings />;
       default:

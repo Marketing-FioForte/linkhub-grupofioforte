@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   LayoutDashboard,
   Zap,
@@ -7,13 +7,16 @@ import {
   CalendarDays,
   Building2,
   Settings,
+  History,
   ArrowLeft,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import logoFioforte from "@/assets/logo-grupo-fioforte.png";
 
 interface AdminSidebarProps {
@@ -28,11 +31,17 @@ const menuItems = [
   { key: "datas", label: "Datas Importantes", icon: Calendar },
   { key: "sipat", label: "SIPAT 2025", icon: CalendarDays },
   { key: "institucional", label: "Institucional", icon: Building2 },
+  { key: "historico", label: "Histórico", icon: History },
   { key: "config", label: "Configurações Gerais", icon: Settings },
 ];
 
 export function AdminSidebar({ activeSection, onSectionChange }: AdminSidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+  };
 
   return (
     <>
@@ -116,7 +125,19 @@ export function AdminSidebar({ activeSection, onSectionChange }: AdminSidebarPro
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t border-border">
+          <div className="p-4 border-t border-border space-y-2">
+            {user && (
+              <div className="px-3 py-2 text-xs text-muted-foreground truncate">
+                {user.email}
+              </div>
+            )}
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Sair
+            </button>
             <Link
               to="/"
               className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
