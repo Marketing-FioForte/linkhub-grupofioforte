@@ -1,8 +1,9 @@
-import { hubConfig } from "@/config/hubConfig";
+import { useHubConfig } from "@/contexts/HubConfigContext";
 import { User } from "lucide-react";
 
 export function PortalButton() {
-  const { portalUrl } = hubConfig.global;
+  const { config } = useHubConfig();
+  const { portalUrl } = config.global;
 
   return (
     <a

@@ -1,4 +1,4 @@
-import { hubConfig } from "@/config/hubConfig";
+import { useHubConfig } from "@/contexts/HubConfigContext";
 import { MessageCircle, Phone, MapPin, Instagram, Linkedin, Globe } from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -11,7 +11,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export function QuickActions() {
-  const { quickActions } = hubConfig;
+  const { config } = useHubConfig();
+  const { quickActions } = config;
 
   return (
     <div className="grid grid-cols-3 gap-3 mb-6">

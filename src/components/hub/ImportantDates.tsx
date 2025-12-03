@@ -1,9 +1,10 @@
-import { hubConfig } from "@/config/hubConfig";
+import { useHubConfig } from "@/contexts/HubConfigContext";
 import { useState } from "react";
 import { Calendar } from "lucide-react";
 
 export function ImportantDates() {
-  const { importantDates } = hubConfig;
+  const { config } = useHubConfig();
+  const { importantDates } = config;
   const [expanded, setExpanded] = useState(false);
 
   const visibleDates = expanded ? importantDates : importantDates.slice(0, 4);
