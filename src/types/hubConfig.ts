@@ -1,10 +1,3 @@
-export interface GlobalConfig {
-  appTitle: string;
-  appSubtitle: string;
-  logoUrl: string;
-  portalUrl: string;
-}
-
 export interface QuickAction {
   key: string;
   label: string;
@@ -13,22 +6,28 @@ export interface QuickAction {
 }
 
 export interface Alert {
-  id: number;
-  text: string;
+  id: string;
+  title: string;
+  message: string;
+  active: boolean;
 }
 
 export interface ImportantDate {
+  id: string;
   date: string;
-  event: string;
+  label: string;
 }
 
 export interface SipatActivity {
+  id: string;
   time: string;
   location: string;
   title: string;
+  description?: string;
 }
 
 export interface SipatDay {
+  id: string;
   date: string;
   label: string;
   activities: SipatActivity[];
@@ -42,7 +41,8 @@ export interface SipatConfig {
   days: SipatDay[];
 }
 
-export interface InstitutionalItem {
+export interface InstitutionalLink {
+  id: string;
   key: string;
   title: string;
   description: string;
@@ -50,17 +50,20 @@ export interface InstitutionalItem {
   url: string;
 }
 
-export interface FooterConfig {
-  text: string;
+export interface GlobalConfig {
+  appTitle: string;
+  logoUrl: string;
+  headerTitle: string;
+  headerSubtitle: string;
+  portalUrl: string;
+  footerText: string;
 }
 
 export interface HubConfig {
   global: GlobalConfig;
   quickActions: QuickAction[];
   alerts: Alert[];
-  alertsLastUpdated: string;
   importantDates: ImportantDate[];
   sipat: SipatConfig;
-  institutional: InstitutionalItem[];
-  footer: FooterConfig;
+  institutional: InstitutionalLink[];
 }

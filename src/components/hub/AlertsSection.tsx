@@ -4,10 +4,12 @@ import { Info } from "lucide-react";
 
 export function AlertsSection() {
   const { config } = useHubConfig();
-  const { alerts, alertsLastUpdated } = config;
+  const activeAlerts = config.alerts.filter((a) => a.active);
   const [expanded, setExpanded] = useState(false);
 
-  const visibleAlerts = expanded ? alerts : alerts.slice(0, 3);
+  const visibleAlerts = expanded ? activeAlerts : activeAlerts.slice(0, 3);
+
+  if (activeAlerts.length === 0) return null;
 
   return (
     <section className="bg-card rounded-2xl p-5 mb-6 border border-border/50 animate-fade-in">
@@ -18,11 +20,11 @@ export function AlertsSection() {
       <ul className="space-y-3">
         {visibleAlerts.map((alert) => (
           <li key={alert.id} className="text-sm text-foreground/90 leading-relaxed">
-            {alert.text}
+            <span className="font-medium">{alert.title}:</span> {alert.message}
           </li>
         ))}
       </ul>
-      {alerts.length > 3 && (
+      {activeAlerts.length > 3 && (
         <button
           onClick={() => setExpanded(!expanded)}
           className="mt-4 text-sm text-primary hover:text-fio-blue-glow transition-colors font-medium"
@@ -30,9 +32,6 @@ export function AlertsSection() {
           {expanded ? "Ver menos avisos" : "Ver todos os avisos"}
         </button>
       )}
-      <p className="mt-4 text-xs text-muted-foreground">
-        Atualizado em {alertsLastUpdated}.
-      </p>
     </section>
   );
 }
