@@ -8,6 +8,7 @@ import {
   Building2,
   Settings,
   History,
+  Users,
   ArrowLeft,
   Menu,
   X,
@@ -32,6 +33,7 @@ const menuItems = [
   { key: "sipat", label: "SIPAT 2025", icon: CalendarDays },
   { key: "institucional", label: "Institucional", icon: Building2 },
   { key: "historico", label: "Histórico", icon: History },
+  { key: "usuarios", label: "Usuários", icon: Users },
   { key: "config", label: "Configurações Gerais", icon: Settings },
 ];
 
