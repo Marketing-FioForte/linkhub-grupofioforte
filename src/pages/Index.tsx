@@ -1,12 +1,27 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { HubHeader } from "@/components/hub/HubHeader";
+import { PortalButton } from "@/components/hub/PortalButton";
+import { QuickActions } from "@/components/hub/QuickActions";
+import { AlertsSection } from "@/components/hub/AlertsSection";
+import { ImportantDates } from "@/components/hub/ImportantDates";
+import { SipatSchedule } from "@/components/hub/SipatSchedule";
+import { InstitutionalSection } from "@/components/hub/InstitutionalSection";
+import { HubFooter } from "@/components/hub/HubFooter";
+import { ScrollToTop } from "@/components/hub/ScrollToTop";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <main className="max-w-[480px] mx-auto px-4 pb-8">
+        <HubHeader />
+        <PortalButton />
+        <QuickActions />
+        <AlertsSection />
+        <ImportantDates />
+        <SipatSchedule />
+        <InstitutionalSection />
+        <HubFooter />
+      </main>
+      <ScrollToTop />
     </div>
   );
 };
