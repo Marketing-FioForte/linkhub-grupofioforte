@@ -10,6 +10,7 @@ import { SipatEditor } from "@/components/admin/SipatEditor";
 import { InstitutionalEditor } from "@/components/admin/InstitutionalEditor";
 import { AdminConfigSettings } from "@/components/admin/AdminConfigSettings";
 import { HistoryEditor } from "@/components/admin/HistoryEditor";
+import { UsersEditor } from "@/components/admin/UsersEditor";
 import { ScrollToTop } from "@/components/hub/ScrollToTop";
 
 const Admin = () => {
@@ -52,6 +53,8 @@ const Admin = () => {
         return <InstitutionalEditor />;
       case "historico":
         return <HistoryEditor />;
+      case "usuarios":
+        return <UsersEditor />;
       case "config":
         return <AdminConfigSettings />;
       default:
