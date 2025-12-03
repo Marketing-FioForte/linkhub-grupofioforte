@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { LogIn, ArrowLeft, Shield } from "lucide-react";
+import { LogIn, ArrowLeft } from "lucide-react";
 import logo from "@/assets/logo-grupo-fioforte.png";
 
 export default function Auth() {
@@ -93,8 +93,8 @@ export default function Auth() {
       <main className="flex-1 flex items-center justify-center p-6">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-              <Shield className="w-6 h-6 text-primary" />
+            <div className="mx-auto mb-4">
+              <img src={logo} alt="Grupo FIOFORTE" className="h-16 w-auto mx-auto" />
             </div>
             <CardTitle>Acesso RH</CardTitle>
             <CardDescription>
