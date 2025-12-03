@@ -12,6 +12,7 @@ interface HubConfigContextType {
   isSaving: boolean;
   error: string | null;
   setConfig: (newConfig: HubConfig) => void;
+  restoreConfig: (newConfig: HubConfig) => void;
   updateGlobal: (global: Partial<HubConfig["global"]>) => void;
   updateQuickActions: (quickActions: HubConfig["quickActions"]) => void;
   updateAlerts: (alerts: HubConfig["alerts"]) => void;
@@ -90,11 +91,21 @@ export function HubConfigProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Save config to database
-  const saveConfig = useCallback(async (newConfig: HubConfig) => {
+  // Save config to database and history
+  const saveConfig = useCallback(async (newConfig: HubConfig, changeType: string = "update") => {
     try {
       setIsSaving(true);
       setError(null);
+
+      // Get current user info
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Get the config ID first
+      const { data: configData } = await supabase
+        .from("hub_config")
+        .select("id")
+        .eq("config_key", CONFIG_KEY)
+        .maybeSingle();
 
       const { error: upsertError } = await supabase
         .from("hub_config")
@@ -110,6 +121,25 @@ export function HubConfigProvider({ children }: { children: ReactNode }) {
       if (upsertError) {
         console.error("Error saving config:", upsertError);
         setError("Erro ao salvar configurações");
+        return;
+      }
+
+      // Save to history if user is authenticated
+      if (user) {
+        const { error: historyError } = await supabase
+          .from("hub_config_history")
+          .insert([{
+            config_id: configData?.id,
+            config_data: JSON.parse(JSON.stringify(newConfig)) as Json,
+            changed_by: user.id,
+            changed_by_email: user.email,
+            change_type: changeType,
+          }]);
+
+        if (historyError) {
+          console.error("Error saving history:", historyError);
+          // Don't set error for history, it's secondary
+        }
       }
     } catch (err) {
       console.error("Unexpected error saving config:", err);
@@ -153,6 +183,11 @@ export function HubConfigProvider({ children }: { children: ReactNode }) {
   const setConfig = (newConfig: HubConfig) => {
     setConfigState(newConfig);
     saveConfig(newConfig);
+  };
+
+  const restoreConfig = (newConfig: HubConfig) => {
+    setConfigState(newConfig);
+    saveConfig(newConfig, "restore");
   };
 
   const updateGlobal = (global: Partial<HubConfig["global"]>) => {
@@ -375,7 +410,7 @@ export function HubConfigProvider({ children }: { children: ReactNode }) {
 
   const resetToDefault = () => {
     setConfigState(defaultConfig);
-    saveConfig(defaultConfig);
+    saveConfig(defaultConfig, "reset");
   };
 
   const exportConfig = () => {
@@ -390,6 +425,7 @@ export function HubConfigProvider({ children }: { children: ReactNode }) {
         isSaving,
         error,
         setConfig,
+        restoreConfig,
         updateGlobal,
         updateQuickActions,
         updateAlerts,
