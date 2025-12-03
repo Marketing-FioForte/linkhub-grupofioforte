@@ -1,4 +1,6 @@
+import { useState, useEffect } from "react";
 import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminLogin } from "@/components/admin/AdminLogin";
 import { GeneralSettings } from "@/components/admin/GeneralSettings";
 import { QuickActionsEditor } from "@/components/admin/QuickActionsEditor";
 import { AlertsEditor } from "@/components/admin/AlertsEditor";
@@ -9,6 +11,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings, Zap, Bell, Calendar, CalendarDays, Building2 } from "lucide-react";
 
 const Admin = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const authStatus = sessionStorage.getItem("adminAuth");
+    setIsAuthenticated(authStatus === "true");
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Carregando...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <AdminLogin onLogin={() => setIsAuthenticated(true)} />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-[600px] mx-auto px-4 pb-8">
