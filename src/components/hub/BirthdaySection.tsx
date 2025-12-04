@@ -69,12 +69,11 @@ export function BirthdaySection() {
             return (
               <div
                 key={birthday.id}
-                className={`bg-card rounded-xl p-4 border flex items-center gap-4 animate-fade-in ${
+                className={`bg-card rounded-xl p-4 border flex items-center gap-4 ${
                   isToday 
                     ? 'border-primary border-2 ring-2 ring-primary/20 shadow-fio-glow' 
                     : 'border-border/50'
                 }`}
-                style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="bg-primary/20 text-primary font-bold text-sm rounded-lg px-3 py-2 min-w-[60px] text-center">
                   {formatDate(birthday.date)}
