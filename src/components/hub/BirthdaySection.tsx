@@ -22,6 +22,11 @@ export function BirthdaySection() {
     .sort((a, b) => {
       const dayA = parseInt(a.date.split("-")[1]);
       const dayB = parseInt(b.date.split("-")[1]);
+      const aIsToday = dayA === currentDay;
+      const bIsToday = dayB === currentDay;
+      // Today's birthdays first, then by day
+      if (aIsToday && !bIsToday) return -1;
+      if (!aIsToday && bIsToday) return 1;
       return dayA - dayB;
     });
 
@@ -75,7 +80,14 @@ export function BirthdaySection() {
                   {formatDate(birthday.date)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground truncate">{birthday.name}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-foreground truncate">{birthday.name}</p>
+                    {isToday && (
+                      <span className="bg-primary/20 text-primary text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
+                        🎂 Hoje!
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground">{birthday.company}</p>
                 </div>
               </div>
