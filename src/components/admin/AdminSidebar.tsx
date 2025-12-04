@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   LogOut,
+  Cake,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ const menuItems = [
   { key: "acoes", label: "Ações Rápidas", icon: Zap },
   { key: "avisos", label: "Avisos", icon: Bell },
   { key: "datas", label: "Datas Importantes", icon: Calendar },
+  { key: "aniversariantes", label: "Aniversariantes", icon: Cake },
   { key: "sipat", label: "SIPAT 2025", icon: CalendarDays },
   { key: "institucional", label: "Institucional", icon: Building2 },
   { key: "historico", label: "Histórico", icon: History },
