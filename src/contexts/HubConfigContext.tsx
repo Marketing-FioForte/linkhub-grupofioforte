@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
-import { HubConfig, Alert, ImportantDate, SipatDay, SipatActivity } from "@/types/hubConfig";
+import { HubConfig, Alert, ImportantDate, SipatDay, SipatActivity, Birthday } from "@/types/hubConfig";
 import { defaultConfig } from "@/config/hubConfigDefault";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
@@ -32,6 +32,9 @@ interface HubConfigContextType {
   updateSipatActivity: (dayId: string, activityId: string, activity: Partial<SipatActivity>) => void;
   deleteSipatActivity: (dayId: string, activityId: string) => void;
   updateInstitutional: (institutional: HubConfig["institutional"]) => void;
+  addBirthday: (birthday: Omit<Birthday, "id">) => void;
+  updateBirthday: (id: string, birthday: Partial<Birthday>) => void;
+  deleteBirthday: (id: string) => void;
   resetToDefault: () => void;
   exportConfig: () => string;
 }
@@ -408,6 +411,36 @@ export function HubConfigProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  // Birthdays
+  const addBirthday = (birthday: Omit<Birthday, "id">) => {
+    setConfigState((prev) => {
+      const newBirthdays = [...(prev.birthdays || []), { ...birthday, id: generateId() }];
+      const updated = { ...prev, birthdays: newBirthdays.sort((a, b) => a.date.localeCompare(b.date)) };
+      saveConfig(updated);
+      return updated;
+    });
+  };
+
+  const updateBirthday = (id: string, birthday: Partial<Birthday>) => {
+    setConfigState((prev) => {
+      const newBirthdays = (prev.birthdays || []).map((b) => (b.id === id ? { ...b, ...birthday } : b));
+      const updated = { ...prev, birthdays: newBirthdays.sort((a, b) => a.date.localeCompare(b.date)) };
+      saveConfig(updated);
+      return updated;
+    });
+  };
+
+  const deleteBirthday = (id: string) => {
+    setConfigState((prev) => {
+      const updated = {
+        ...prev,
+        birthdays: (prev.birthdays || []).filter((b) => b.id !== id),
+      };
+      saveConfig(updated);
+      return updated;
+    });
+  };
+
   const resetToDefault = () => {
     setConfigState(defaultConfig);
     saveConfig(defaultConfig, "reset");
@@ -445,6 +478,9 @@ export function HubConfigProvider({ children }: { children: ReactNode }) {
         updateSipatActivity,
         deleteSipatActivity,
         updateInstitutional,
+        addBirthday,
+        updateBirthday,
+        deleteBirthday,
         resetToDefault,
         exportConfig,
       }}

@@ -50,6 +50,13 @@ export interface InstitutionalLink {
   url: string;
 }
 
+export interface Birthday {
+  id: string;
+  name: string;
+  date: string; // formato "MM-DD" (mês-dia)
+  company: string;
+}
+
 export interface GlobalConfig {
   appTitle: string;
   logoUrl: string;
@@ -66,4 +73,5 @@ export interface HubConfig {
   importantDates: ImportantDate[];
   sipat: SipatConfig;
   institutional: InstitutionalLink[];
+  birthdays: Birthday[];
 }

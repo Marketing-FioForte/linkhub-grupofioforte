@@ -6,6 +6,7 @@ import { AdminSummary } from "@/components/admin/AdminSummary";
 import { QuickActionsEditor } from "@/components/admin/QuickActionsEditor";
 import { AlertsEditor } from "@/components/admin/AlertsEditor";
 import { DatesEditor } from "@/components/admin/DatesEditor";
+import { BirthdaysEditor } from "@/components/admin/BirthdaysEditor";
 import { SipatEditor } from "@/components/admin/SipatEditor";
 import { InstitutionalEditor } from "@/components/admin/InstitutionalEditor";
 import { AdminConfigSettings } from "@/components/admin/AdminConfigSettings";
@@ -50,6 +51,8 @@ const Admin = () => {
         return <AlertsEditor />;
       case "datas":
         return <DatesEditor />;
+      case "aniversariantes":
+        return <BirthdaysEditor />;
       case "sipat":
         return <SipatEditor />;
       case "institucional":

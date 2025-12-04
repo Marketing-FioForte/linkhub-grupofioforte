@@ -108,4 +108,5 @@ export const defaultConfig: HubConfig = {
       url: "https://grupofioforte.com.br/politica-de-privacidade",
     },
   ],
+  birthdays: [],
 };

@@ -3,6 +3,7 @@ import { PortalButton } from "@/components/hub/PortalButton";
 import { QuickActions } from "@/components/hub/QuickActions";
 import { AlertsSection } from "@/components/hub/AlertsSection";
 import { ImportantDates } from "@/components/hub/ImportantDates";
+import { BirthdaySection } from "@/components/hub/BirthdaySection";
 import { SipatSchedule } from "@/components/hub/SipatSchedule";
 import { InstitutionalSection } from "@/components/hub/InstitutionalSection";
 import { AdminAccessButton } from "@/components/hub/AdminAccessButton";
@@ -18,6 +19,7 @@ const Index = () => {
         <QuickActions />
         <AlertsSection />
         <ImportantDates />
+        <BirthdaySection />
         <SipatSchedule />
         <InstitutionalSection />
         <AdminAccessButton />
