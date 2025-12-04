@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useHubConfig } from "@/contexts/HubConfigContext";
-import { Cake } from "lucide-react";
+import { Cake, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const MONTH_NAMES = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -8,6 +10,7 @@ const MONTH_NAMES = [
 
 export function BirthdaySection() {
   const { config } = useHubConfig();
+  const [isOpen, setIsOpen] = useState(false);
   
   const currentMonth = new Date().getMonth() + 1;
   const currentMonthStr = currentMonth.toString().padStart(2, "0");
@@ -31,26 +34,40 @@ export function BirthdaySection() {
 
   return (
     <section className="mb-6">
-      <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <Cake className="w-5 h-5 text-primary" />
-        Aniversariantes de {MONTH_NAMES[currentMonth - 1]} 🎉
-      </h2>
-      <div className="space-y-2">
-        {birthdaysThisMonth.map((birthday) => (
-          <div
-            key={birthday.id}
-            className="bg-card rounded-xl p-4 border border-border/50 flex items-center gap-4"
-          >
-            <div className="bg-primary/20 text-primary font-bold text-sm rounded-lg px-3 py-2 min-w-[60px] text-center">
-              {formatDate(birthday.date)}
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger className="w-full">
+          <div className="bg-card rounded-xl p-4 border border-border/50 flex items-center justify-between cursor-pointer hover:bg-card/80 transition-colors">
+            <div className="flex items-center gap-2">
+              <Cake className="w-5 h-5 text-primary" />
+              <span className="text-lg font-semibold">
+                Aniversariantes de {MONTH_NAMES[currentMonth - 1]} 🎉
+              </span>
+              <span className="text-sm text-muted-foreground">
+                ({birthdaysThisMonth.length})
+              </span>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-foreground truncate">{birthday.name}</p>
-              <p className="text-sm text-muted-foreground">{birthday.company}</p>
-            </div>
+            <ChevronDown 
+              className={`w-5 h-5 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
+            />
           </div>
-        ))}
-      </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-2 space-y-2">
+          {birthdaysThisMonth.map((birthday) => (
+            <div
+              key={birthday.id}
+              className="bg-card rounded-xl p-4 border border-border/50 flex items-center gap-4"
+            >
+              <div className="bg-primary/20 text-primary font-bold text-sm rounded-lg px-3 py-2 min-w-[60px] text-center">
+                {formatDate(birthday.date)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-foreground truncate">{birthday.name}</p>
+                <p className="text-sm text-muted-foreground">{birthday.company}</p>
+              </div>
+            </div>
+          ))}
+        </CollapsibleContent>
+      </Collapsible>
     </section>
   );
 }
