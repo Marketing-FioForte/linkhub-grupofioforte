@@ -51,11 +51,12 @@ export function BirthdaySection() {
             />
           </div>
         </CollapsibleTrigger>
-        <CollapsibleContent className="mt-2 space-y-2">
-          {birthdaysThisMonth.map((birthday) => (
+        <CollapsibleContent className="mt-2 space-y-2 data-[state=open]:animate-fade-in">
+          {birthdaysThisMonth.map((birthday, index) => (
             <div
               key={birthday.id}
-              className="bg-card rounded-xl p-4 border border-border/50 flex items-center gap-4"
+              className="bg-card rounded-xl p-4 border border-border/50 flex items-center gap-4 animate-fade-in"
+              style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className="bg-primary/20 text-primary font-bold text-sm rounded-lg px-3 py-2 min-w-[60px] text-center">
                 {formatDate(birthday.date)}
