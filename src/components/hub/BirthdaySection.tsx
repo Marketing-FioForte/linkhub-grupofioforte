@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useHubConfig } from "@/contexts/HubConfigContext";
 import { Cake, ChevronDown } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const MONTH_NAMES = [
@@ -10,12 +11,18 @@ const MONTH_NAMES = [
 
 export function BirthdaySection() {
   const { config } = useHubConfig();
+  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   
   const today = new Date();
   const currentMonth = today.getMonth() + 1;
   const currentDay = today.getDate();
   const currentMonthStr = currentMonth.toString().padStart(2, "0");
+
+  const isBirthdayToday = (dateStr: string) => {
+    const [, day] = dateStr.split("-");
+    return parseInt(day) === currentDay;
+  };
   
   const birthdaysThisMonth = (config.birthdays || [])
     .filter((b) => b.date.startsWith(currentMonthStr))
@@ -30,6 +37,26 @@ export function BirthdaySection() {
       return dayA - dayB;
     });
 
+  const birthdaysToday = birthdaysThisMonth.filter(b => isBirthdayToday(b.date));
+
+  useEffect(() => {
+    if (birthdaysToday.length > 0) {
+      const timer = setTimeout(() => {
+        const names = birthdaysToday.map(b => b.name);
+        const message = birthdaysToday.length === 1
+          ? `🎂 Hoje é aniversário de ${names[0]}!`
+          : `🎂 Hoje é aniversário de ${names.slice(0, -1).join(", ")} e ${names[names.length - 1]}!`;
+        
+        toast({
+          title: "Parabéns! 🎉",
+          description: message,
+        });
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   if (birthdaysThisMonth.length === 0) {
     return null;
   }
@@ -37,11 +64,6 @@ export function BirthdaySection() {
   const formatDate = (dateStr: string) => {
     const [month, day] = dateStr.split("-");
     return `${day}/${month}`;
-  };
-
-  const isBirthdayToday = (dateStr: string) => {
-    const [, day] = dateStr.split("-");
-    return parseInt(day) === currentDay;
   };
 
   return (
