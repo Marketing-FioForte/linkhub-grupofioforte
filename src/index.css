@@ -4,48 +4,54 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Lora&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code&display=swap");
+
 /* Grupo FIOFORTE Design System - Dark Corporate Theme */
 
 @layer base {
   :root {
-    --background: 222 47% 2%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 96%;
+    --foreground: 0 0% 10%;
 
-    --card: 222 47% 7%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
 
-    --popover: 222 47% 7%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 225 90% 35%;
+    --primary-foreground: 0 0% 96%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 210 5% 93%;
+    --secondary-foreground: 220 87% 9%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 210 5% 93%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 217 91% 60%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 216 64% 90%;
+    --accent-foreground: 220 87% 9%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 96%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 217 91% 60%;
+    --border: 220 7% 83%;
+    --input: 220 7% 83%;
+    --ring: 217 100% 58%;
 
-    --radius: 1rem;
+    --radius: 0.625rem;
 
     --sidebar-background: 222 47% 5%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 217 33% 17%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-foreground: 265 4% 12.9%;
+    --sidebar-primary: 266 4% 20.8%;
+    --sidebar-primary-foreground: 248 0.3% 98.4%;
+    --sidebar-accent: 248 0.7% 96.8%;
+    --sidebar-accent-foreground: 266 4% 20.8%;
+    --sidebar-border: 256 1.3% 92.9%;
+    --sidebar-ring: 257 4% 70.4%;
 
     /* Custom tokens for FIOFORTE */
     --fio-blue: 217 91% 60%;
@@ -53,36 +59,69 @@
     --fio-card-hover: 217 33% 20%;
     --fio-text-secondary: 215 20% 65%;
     --fio-date-pill: 217 91% 60%;
+    --chart-1: 225 90% 35%;
+    --chart-2: 217 100% 58%;
+    --chart-3: 220 87% 9%;
+    --chart-4: 217 96% 71%;
+    --chart-5: 217 88% 81%;
+    --sidebar: 248 0.3% 98.4%;
+    --font-sans: Poppins, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    --font-serif: Lora, ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
+    --font-mono: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --shadow-sm: 0px 3px 6px -3px hsla(0, 0%, 0%, 0.2);
+    --shadow: 0px 3px 12px -3px hsla(0, 0%, 0%, 0.2);
+    --shadow-md: 0px 3px 18px -3px hsla(0, 0%, 0%, 0.2);
+    --shadow-lg: 0px 3px 30px -3px hsla(0, 0%, 0%, 0.2);
+    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    --tracking-normal: 0em;
+    --spacing: 0.25rem;
   }
 
   .dark {
-    --background: 222 47% 2%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 7%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 7%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 91% 60%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 217 91% 60%;
+    --background: 220 87% 9%;
+    --foreground: 0 0% 96%;
+    --card: 218 79% 13%;
+    --card-foreground: 0 0% 96%;
+    --popover: 218 79% 13%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 217 100% 58%;
+    --primary-foreground: 220 87% 9%;
+    --secondary: 219 75% 17%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 218 71% 13%;
+    --muted-foreground: 215 16% 71%;
+    --accent: 225 90% 35%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 74% 45%;
+    --destructive-foreground: 0 0% 96%;
+    --border: 218 64% 20%;
+    --input: 218 64% 20%;
+    --ring: 217 100% 58%;
     --sidebar-background: 222 47% 5%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 217 33% 17%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-foreground: 248 0.3% 98.4%;
+    --sidebar-primary: 264 24.3% 48.8%;
+    --sidebar-primary-foreground: 248 0.3% 98.4%;
+    --sidebar-accent: 260 4.1% 27.9%;
+    --sidebar-accent-foreground: 248 0.3% 98.4%;
+    --sidebar-border: 0 0% 100% / 10%;
+    --sidebar-ring: 264 2.7% 55.1%;
+    --chart-1: 217 100% 58%;
+    --chart-2: 225 90% 35%;
+    --chart-3: 216 100% 81%;
+    --chart-4: 0 0% 96%;
+    --chart-5: 216 14% 50%;
+    --sidebar: 266 4% 20.8%;
+    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --shadow-sm: 0px 6px 9px 0px hsla(0, 0%, 0%, 0.2);
+    --shadow: 0px 6px 18px 0px hsla(0, 0%, 0%, 0.2);
+    --shadow-md: 0px 6px 27px 0px hsla(0, 0%, 0%, 0.2);
+    --shadow-lg: 0px 6px 45px 0px hsla(0, 0%, 0%, 0.2);
+    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   }
 }
 
